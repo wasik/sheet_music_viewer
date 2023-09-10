@@ -1,0 +1,8 @@
+services:
+  sheet-music-viewer-dev:
+    build:
+      context: .
+    container_name: sheet-music-viewer-dev
+    tty: true
+    volumes:
+       - .:/home/user

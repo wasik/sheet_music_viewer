@@ -14,3 +14,14 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+## Development Environment With Docker 
+
+If you don't want to install development tools to "bare metal", it is possible to 
+run the whole development environment as a docker container and to connect to it 
+from e.g. VSCode remote. (Credits: https://dev.to/ameysunu/dockerize-your-flutter-app-3feg)
+
+To build the docker image, run 
+
+    docker build -t flutterdockerfile .
