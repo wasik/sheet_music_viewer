@@ -22,6 +22,6 @@ If you don't want to install development tools to "bare metal", it is possible t
 run the whole development environment as a docker container and to connect to it 
 from e.g. VSCode remote. (Credits: https://dev.to/ameysunu/dockerize-your-flutter-app-3feg)
 
-To build the docker image, run 
+To start the development container, run: 
 
-    docker build -t flutterdockerfile .
+    docker container up
