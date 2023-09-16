@@ -24,4 +24,7 @@ from e.g. VSCode remote. (Credits: https://dev.to/ameysunu/dockerize-your-flutte
 
 To start the development container, run: 
 
-    docker container up
+    docker compose up
+
+After that you can run for example VSCode and with command "Attach to a running container" chose
+the "sheet-music-viewer..." container, and access the project within container's /project directory
