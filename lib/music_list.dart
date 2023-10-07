@@ -11,8 +11,8 @@ class MusicList extends StatefulWidget {
   final int? setId;
   final void Function(int)? changeBottomNavTab;
 
-  const MusicList({Key? key, this.setId, this.changeBottomNavTab}) : super(key: key);
-
+  const MusicList({Key? key, this.setId, this.changeBottomNavTab})
+      : super(key: key);
 
   @override
   _MusicListState createState() => _MusicListState();
@@ -54,23 +54,36 @@ class _MusicListState extends State<MusicList> {
   Widget build(BuildContext context) {
     Widget bodyWidget;
     if (songs.isEmpty) {
-      bodyWidget = Center(
+      bodyWidget = const Center(
         child: Text(
           'No sheets found. Import sheets on the Settings tab.',
           style: TextStyle(fontSize: 18),
         ),
       );
     } else {
-      bodyWidget = ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: songs.length,
-          itemBuilder: (BuildContext context, int index) {
-            return MusicListRow(
+      bodyWidget = ReorderableListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: songs.length,
+        itemBuilder: (BuildContext context, int index) {
+          return MusicListRow(
               key: ObjectKey(songs[index]),
-                initialSong: songs[index],
-                isPartOfListId: widget.setId,
-                onSongNameUpdated: rebuildSonglist);
+              initialSong: songs[index],
+              isPartOfListId: widget.setId,
+              onSongNameUpdated: rebuildSonglist);
+        },
+        onReorder: (int oldIndex, int newIndex) {
+          setState(() {
+            if (newIndex > oldIndex) {
+              newIndex -= 1;
+            }
+            final Song song = songs.removeAt(oldIndex);
+            songs.insert(newIndex, song);
+            if (widget.setId != null && currentset != null) {
+              db.saveSet(widget.setId, songs.map((e) => e.id).toList(), currentset!.name);
+            }
           });
+        },
+      );
     }
 
     Widget floatingActionButton = Container();
