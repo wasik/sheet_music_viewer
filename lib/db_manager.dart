@@ -221,7 +221,8 @@ print("Called db.getSongsForSet where setId=${setId}");
       version: migrations.length,
       onCreate: (db, version) async {
         print("Creating new database... ${db}");
-        _runMigrations(db, 1, version);
+        _runMigrations(db, 0, version);
+
         print("Database tables (hopefully) created...");
       },
       onUpgrade: _runMigrations,
