@@ -231,7 +231,8 @@ print("Called db.getSongsForSet where setId=${setId}");
   Future _runMigrations(Database db, int oldVersion, newVersion) async {
         var batch = db.batch();
         print("Migrate database $oldVersion -> $newVersion");
-        for (var i = oldVersion - 1; i < newVersion; i++) {
+        for (var i = oldVersion; i < newVersion; i++) {
+
           migrations[i](batch);
         }
         await batch.commit();
