@@ -4,5 +4,7 @@ services:
       context: .
     container_name: sheet-music-viewer-dev
     tty: true
+    privileged: true
     volumes:
        - .:/project
+       - /dev/bus/usb:/dev/bus/usb

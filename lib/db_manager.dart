@@ -117,9 +117,8 @@ print("Called db.getSongsForSet where setId=${setId}");
         from songs, setsongs 
         where setsongs.song_id=songs.id 
         and setsongs.set_id=?
-        order by songs.display_name
-        ''',
-        [setId]);
+        order by setsongs.ordering, songs.display_name
+        ''', [setId]);
     }
 
     List<Song> songs = list.map((songs) => Song.fromMap(songs)).toList();
@@ -171,7 +170,7 @@ print("Called db.getSongsForSet where setId=${setId}");
     print("Done deleting set ID ${setId}");
   }
 
-  Future<int> saveSet(int? setId, Map selectedSongIds, String setName) async {
+  Future<int> saveSet(int? setId, List<int> selectedSongIds, String setName) async {
     Database database = await instance.database;
     int updatedId;
 
@@ -186,12 +185,13 @@ print("Called db.getSongsForSet where setId=${setId}");
     }
 //print("Added or updated a set with ID: ${updatedId}");
     await database.rawDelete('delete from setsongs where set_id=?', [setId]);
-    for (int songid in selectedSongIds.keys) {
-      await database.rawInsert('insert into setsongs (set_id, song_id) values(?, ?)',
-          [updatedId, songid]);
-    };
-
-
+    int ordering = 0;
+    for (int songid in selectedSongIds) {
+      await database.rawInsert(
+          'insert into setsongs (set_id, song_id, ordering) values(?, ?, ?)',
+          [updatedId, songid, ordering]);
+      ordering += 1;
+    }
 
     return updatedId;
   }
@@ -218,40 +218,35 @@ print("Called db.getSongsForSet where setId=${setId}");
 
     return await openDatabase(
       path,
-      version: 1,
-      onCreate: _onCreate,
-      onUpgrade: (db, oldVersion, newVersion) async {
-        var batch = db.batch();
-        if (oldVersion == 1) {
-          // We update existing table and create the new tables
-          /*_updateTableCompanyV1toV2(batch);
-          _createTableEmployeeV2(batch);
-          */
-        }
-        await batch.commit();
-      },
+      version: migrations.length,
+      onCreate: (db, version) async {
+        print("Creating new database... ${db}");
+        _runMigrations(db, 0, version);
 
+        print("Database tables (hopefully) created...");
+      },
+      onUpgrade: _runMigrations,
     );
   }
 
-  void _createTableCompanyV2(Batch batch) {
-    batch.execute('DROP TABLE IF EXISTS Company');
-    batch.execute('''CREATE TABLE Company (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    description TEXT
-)''');
+  Future _runMigrations(Database db, int oldVersion, newVersion) async {
+        var batch = db.batch();
+        print("Migrate database $oldVersion -> $newVersion");
+        for (var i = oldVersion; i < newVersion; i++) {
+
+          migrations[i](batch);
+        }
+        await batch.commit();
   }
 
+  var migrations = [
+    _initialize1,
+    _upgrade2,
+  ];
 
-  // Creates the database structure
-  Future _onCreate(
-      Database db,
-      int version,
-      ) async {
-    print("Creating new database... ${db}");
-
-    await db.execute('''create table songs (
+  static void _initialize1(Batch batch) {
+    print("Initializing database...");
+    batch.execute('''create table songs (
     id integer primary key not null, 
     filename text,
     display_name text,
@@ -260,20 +255,14 @@ print("Called db.getSongsForSet where setId=${setId}");
     extension text
     );''');
 
-    /*
-    int id2 = await db.rawInsert(
-        'INSERT INTO songs (filename) VALUES(?)',
-        ['another name']);
-
-    List<Map> list = await db.rawQuery('SELECT * FROM songs');
-    print("Songs: ${list}");
-*/
-
-    await db.execute('''
+    batch.execute('''
       create table sets (id integer primary key not null,
       name text);          ''');
-    await db.execute('''create table setsongs (song_id int, set_id int);''');
+    batch.execute('''create table setsongs (song_id int, set_id int);''');
+  }
 
-    print("Database tables (hopefully) created...");
+  static void _upgrade2(Batch batch) {
+    print("Migration 2");
+    batch.execute("alter table setsongs add column ordering;");
   }
 }

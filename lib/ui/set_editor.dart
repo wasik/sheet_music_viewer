@@ -56,7 +56,7 @@ class _SetEditorState extends State<SetEditor> {
 
     await db.saveSet(
         widget.set == null ? null : widget.set!.id,
-        checkedIds,
+        checkedIds.keys.map((k) => k as int).toList(),
       newName
     );
     widget.onSetChanged();
