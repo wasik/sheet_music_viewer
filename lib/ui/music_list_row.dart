@@ -10,7 +10,7 @@ class MusicListRow extends StatefulWidget {
   final int? isPartOfListId;
   final VoidCallback onSongNameUpdated;
 
-  const MusicListRow({Key? key, required this.initialSong, required this.isPartOfListId, required this.onSongNameUpdated}) : super(key: key);
+  const MusicListRow({super.key, required this.initialSong, required this.isPartOfListId, required this.onSongNameUpdated});
 
   @override
   _MusicListRowState createState() => _MusicListRowState();
@@ -24,7 +24,7 @@ class _MusicListRowState extends State<MusicListRow> {
 
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController _changeSongDisplayNameController = TextEditingController();
+  final TextEditingController _changeSongDisplayNameController = TextEditingController();
 
   /*
   void updateSong() async {
@@ -76,11 +76,11 @@ class _MusicListRowState extends State<MusicListRow> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Rename Song'),
-            content: permanentlyDelete ? Text("Are you sure you want to remove this sheet from this app and any sets it belongs to?") : Text("Are you sure you want to remove this sheet from this set?"),
+            title: const Text('Rename Song'),
+            content: permanentlyDelete ? const Text("Are you sure you want to remove this sheet from this app and any sets it belongs to?") : const Text("Are you sure you want to remove this sheet from this set?"),
             actions: <Widget>[
               TextButton(
-                child: Text('Cancel'),
+                child: const Text('Cancel'),
                 onPressed: () {
                   setState(() {
                     Navigator.pop(context);
@@ -88,7 +88,7 @@ class _MusicListRowState extends State<MusicListRow> {
                 },
               ),
               TextButton(
-                child: Text('Remove'),
+                child: const Text('Remove'),
                 onPressed: () {
                   if (permanentlyDelete) {
                     //If this is the "All Sheets" page and we want to permanently delete this widget...
@@ -114,7 +114,7 @@ class _MusicListRowState extends State<MusicListRow> {
 
     Widget setSelector = Container();
     if (sets.isEmpty) {
-      setSelector = Text("(No sets found; create a set on the Sets tab)");
+      setSelector = const Text("(No sets found; create a set on the Sets tab)");
     } else {
       setSelector = Container();
     }
@@ -128,36 +128,36 @@ class _MusicListRowState extends State<MusicListRow> {
               builder:(BuildContext context, StateSetter setState)
           {
             return SingleChildScrollView(child:
-            Container(
+            SizedBox(
                 width: double.maxFinite,
                 child: Form(
                     key: _formKey,
                     child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          Align(alignment: Alignment.centerLeft,
+                          const Align(alignment: Alignment.centerLeft,
                               child: Text("Song Name", style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w400),
                               )),
                           TextFormField(
                             onChanged: (value) {},
                             controller: _changeSongDisplayNameController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                                 hintText: "Song Display Name"),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Align(alignment: Alignment.centerLeft, child:
-                          Text(song.filename, style: TextStyle(fontSize: 14))
+                          Text(song.filename, style: const TextStyle(fontSize: 14))
                           ),
-                          SizedBox(height: 40),
-                          Align(alignment: Alignment.centerLeft,
+                          const SizedBox(height: 40),
+                          const Align(alignment: Alignment.centerLeft,
                               child: Text("Sets", style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w400),
                                 )),
                             if (sets.isEmpty)
-                              Text("No sets - create a new set on the Sets tab")
+                              const Text("No sets - create a new set on the Sets tab")
                             else
                               ConstrainedBox(
                                 constraints: BoxConstraints(
@@ -180,7 +180,7 @@ class _MusicListRowState extends State<MusicListRow> {
                                               : false,
                                           onChanged: (value) {
                                             print(
-                                                "Song ID: ${song.id}; set ID: ${setIdAtIndex} was tapped");
+                                                "Song ID: ${song.id}; set ID: $setIdAtIndex was tapped");
                                             setState(() {
                                               if (checkedIds
                                                   .containsKey(setIdAtIndex)) {
@@ -201,7 +201,7 @@ class _MusicListRowState extends State<MusicListRow> {
           ,
             actions: <Widget>[
               TextButton(
-                child: Text('Cancel'),
+                child: const Text('Cancel'),
                 onPressed: () {
                   setState(() {
                     Navigator.pop(context);
@@ -209,7 +209,7 @@ class _MusicListRowState extends State<MusicListRow> {
                 },
               ),
               ElevatedButton(
-                child: Text('Save'),
+                child: const Text('Save'),
                 onPressed: () {
                   String newSongName = _changeSongDisplayNameController.text;
                   if (newSongName.trim().isEmpty) {
@@ -234,13 +234,13 @@ class _MusicListRowState extends State<MusicListRow> {
     PopupMenuItem deleteMenuItem;
     if (widget.isPartOfListId == null) {
       deleteMenuItem = const PopupMenuItem(
-        child: Text("Delete from App"),
         value: "delete",
+        child: Text("Delete from App"),
       );
     } else {
       deleteMenuItem = const PopupMenuItem(
-        child: Text("Remove from Set"),
         value: "remove",
+        child: Text("Remove from Set"),
       );
     }
 
@@ -249,11 +249,14 @@ class _MusicListRowState extends State<MusicListRow> {
     return Card(
         child: ListTile(
             //color: Colors.amber[colorCodes[index]],
-            title: Text(song.toString()),
+            title: Text(song.toString(), style: TextStyle(
+              fontSize: 18,
+            )
+            ),
             subtitle: Text("${song.pages} pages "),
             //trailing: Icon(Icons.more_vert),
             trailing: PopupMenuButton(
-              child: Icon(Icons.more_vert),
+              child: const Icon(Icons.more_vert),
               onSelected: (value) {
                 if (value == "edit") {
                   _displayEditSongDialog(context);
@@ -265,8 +268,8 @@ class _MusicListRowState extends State<MusicListRow> {
               },
               itemBuilder: (context) => [
                 const PopupMenuItem(
-                  child: Text("Edit Name / Sets"),
                   value: "edit",
+                  child: Text("Edit Name / Sets"),
                 ),
 
                 deleteMenuItem

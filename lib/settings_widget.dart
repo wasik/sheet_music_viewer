@@ -5,7 +5,6 @@ import 'data/song.dart';
 import 'ui/settings_footpedal_config_row.dart';
 
 import 'package:path/path.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,7 +14,7 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 
 
 class SettingsWidget extends StatefulWidget {
-  SettingsWidget() {}
+  const SettingsWidget({super.key});
 
   @override
   State<SettingsWidget> createState() => _SettingsWidgetState();
@@ -32,14 +31,14 @@ class _SettingsWidgetState extends State<SettingsWidget> {
   int numFilesToImport = 0;
   int numFilesImported = 0;
 
-  String? default_file_import_dir = null;
+  String? default_file_import_dir;
 
   Future<String> _getDirPath() async {
-    final _dir = await getApplicationDocumentsDirectory();
-    storage_path = join(_dir.path, "music");
-    print("Application documents directory: ${_dir}");
+    final dir = await getApplicationDocumentsDirectory();
+    storage_path = join(dir.path, "music");
+    print("Application documents directory: $dir");
 
-    return _dir.path;
+    return dir.path;
   }
   Future<void> _getSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -80,7 +79,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
 
      */
     List<Song> songs = await DbManager.instance.getSongsForSet(null);
-    print("Songs: ${songs}");
+    print("Songs: $songs");
   }
 
   /*
@@ -110,20 +109,20 @@ class _SettingsWidgetState extends State<SettingsWidget> {
   }*/
 
   Future<void> _importPDFFile(BuildContext context, String filepath) async {
-    print("Checking if file exists: ${filepath}");
+    print("Checking if file exists: $filepath");
     bool doesFileExist = await DbManager.instance.doesSongExist(filepath);
-    print("Does file exist? ${doesFileExist}");
+    print("Does file exist? $doesFileExist");
     try {
       if (doesFileExist == false) {
         final document = await PdfDocument.openFile(filepath);
 
         int newId = await DbManager.instance
             .addSongFromFile(filepath, document.pagesCount);
-        print("New ID from addSongFromFile: ${newId}");
+        print("New ID from addSongFromFile: $newId");
         if (newId > 0) {
           Song? newsong = await DbManager.instance.loadSong(newId);
           if (newsong != null) {
-            print("New song: ${newsong}");
+            print("New song: $newsong");
 
             /* Now copy over the file */
             /*
@@ -144,8 +143,8 @@ class _SettingsWidgetState extends State<SettingsWidget> {
                   quality: 95,
                   format: PdfPageImageFormat.jpeg);
 
-              String page_path = join(pathToSongDir, "${i}.jpg");
-              await File(page_path).writeAsBytes(pageImage!.bytes);
+              String pagePath = join(pathToSongDir, "$i.jpg");
+              await File(pagePath).writeAsBytes(pageImage!.bytes);
 
               await page.close();
             }
@@ -168,9 +167,9 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       numFilesImported = 0;
       numFilesToImport = result.files.length;
 
-      print("Num files to import: ${numFilesToImport}");
+      print("Num files to import: $numFilesToImport");
       if (numFilesToImport > 0) {
-        print("Going to show PD with max of ${numFilesToImport}");
+        print("Going to show PD with max of $numFilesToImport");
         pd.show(
           max: numFilesToImport,
           msg: 'Importing Sheets...',
@@ -179,7 +178,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
         );
       }
 
-      if (files.length > 0) {
+      if (files.isNotEmpty) {
         Directory parentDir = files[0].parent;
         setState(() {
           default_file_import_dir = parentDir.path;
@@ -191,7 +190,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
 
         numFilesImported++;
         print(
-            "Updating the PD spinner with num files: ${numFilesImported}");
+            "Updating the PD spinner with num files: $numFilesImported");
         pd.update(value: numFilesImported);
 
         //file.copySync();
@@ -200,7 +199,7 @@ class _SettingsWidgetState extends State<SettingsWidget> {
       // User canceled the picker
       showDialog(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) => const AlertDialog(
                 content: Text("File selection cancelled"),
               ));
     }
@@ -253,42 +252,42 @@ class _SettingsWidgetState extends State<SettingsWidget> {
 
           return Column(
                 children: [AppBar(
-                  title: Text("Settings"),
+                  title: const Text("Settings"),
                 ),
                   Expanded(child:
           ListView(padding: const EdgeInsets.all(20),
             children: <Widget>[
               Text("Import Sheet Music Files",
-              style: Theme.of(context).textTheme.headline5),
-              SizedBox(height: 20),
+              style: Theme.of(context).textTheme.headlineSmall),
+              const SizedBox(height: 20),
               Text('Click the button below to choose .pdf files to import. These files must already be on your device (eg. either copied over by a USB cable, or in your Downloads folder)',
-                  style: Theme.of(context).textTheme.bodyText2),
+                  style: Theme.of(context).textTheme.bodyMedium),
               //Text(snapshot.data.toString()),
               /*ElevatedButton(
                 child: Text("Choose Import Directory..."),
                 onPressed: _chooseImportDirectory,
               ),*/
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
-                child: Text("Import Files..."),
+                child: const Text("Import Files..."),
                 onPressed: () {_importFiles(context);}
               ),
 
-              new Divider(height: 30.0),
+              const Divider(height: 30.0),
               Text("Foot Pedal Configuration",
-                style: Theme.of(context).textTheme.headline5),
-              SizedBox(height: 20),
+                style: Theme.of(context).textTheme.headlineSmall),
+              const SizedBox(height: 20),
 
-              SettingsFootpedalConfigRow(label: "Previous Page", storageKey: 'prev'),
-              SizedBox(height:20),
-              SettingsFootpedalConfigRow(label: "Next Page", storageKey: 'next'),
+              const SettingsFootpedalConfigRow(label: "Previous Page", storageKey: 'prev'),
+              const SizedBox(height:20),
+              const SettingsFootpedalConfigRow(label: "Next Page", storageKey: 'next'),
 
-              new Divider(height: 30.0),
+              const Divider(height: 30.0),
               Text("Configuration",
-                  style: Theme.of(context).textTheme.headline5),
-              SizedBox(height: 20),
+                  style: Theme.of(context).textTheme.headlineSmall),
+              const SizedBox(height: 20),
 
-                 ListTile(title: Text("Show Timer"),
+                 ListTile(title: const Text("Show Timer"),
                    trailing: DropdownButton<int>(
                        value: showTimerStatus,
                        icon: const Icon(Icons.arrow_downward),
@@ -318,22 +317,20 @@ class _SettingsWidgetState extends State<SettingsWidget> {
           ),
 
 
-              new SizedBox(height:20),
-                    ListTile(title: Text("Show Progress Indicator"),
+              const SizedBox(height:20),
+                    ListTile(title: const Text("Show Progress Indicator"),
                     trailing: Switch(value: showBottomProgressIndicator,
                     onChanged: (bool newValue) async {
-                      if (newValue != null) {
-                        SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        await prefs.setBool('showBottomProgressIndicator', newValue);
-                        setState(() {
-                          showBottomProgressIndicator = newValue;
-                        });
-                      }
-                    },)),
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.setBool('showBottomProgressIndicator', newValue);
+                      setState(() {
+                        showBottomProgressIndicator = newValue;
+                      });
+                                        },)),
 
-              new SizedBox(height:20),
-              ListTile(title: Text("Hide Song Title/Nav Bar in Viewer"),
+              const SizedBox(height:20),
+              ListTile(title: const Text("Hide Song Title/Nav Bar in Viewer"),
                 trailing: Switch(value: hideTopNavBar,
                 onChanged: (bool newValue) async {
                   SharedPreferences prefs =

@@ -20,7 +20,7 @@ class Viewer extends StatefulWidget {
   final int songId;
 
 //  const Viewer({Key? key, this.songId}) : super(key: key);
-  Viewer(this.songId);
+  const Viewer(this.songId, {super.key});
 
   @override
   _ViewerState createState() => _ViewerState();
@@ -57,7 +57,7 @@ class _ViewerState extends State<Viewer> {
   late final PageController _pageController;
 
   //late final PDFDocument document;
-  bool _isLoading = true;
+  final bool _isLoading = true;
 
   @override
   void dispose() {
@@ -93,7 +93,7 @@ class _ViewerState extends State<Viewer> {
 
       _pageController = PageController(initialPage: 0);
 
-      timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
         setState(() {
           timeOpen = DateTime.now().difference(openTime);
         });
@@ -107,11 +107,11 @@ class _ViewerState extends State<Viewer> {
 
   Future<Map> getSongAndPath() async {
     Map res = {};
-    Song? loaded_song = await db.loadSong(widget.songId);
-    res['song'] = loaded_song;
-    if (loaded_song != null) {
-      res['song_path'] = await loaded_song.path_to_pdf();
-      res['song_dir'] = await loaded_song.path_to_dir();
+    Song? loadedSong = await db.loadSong(widget.songId);
+    res['song'] = loadedSong;
+    if (loadedSong != null) {
+      res['song_path'] = await loadedSong.path_to_pdf();
+      res['song_dir'] = await loadedSong.path_to_dir();
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -123,7 +123,7 @@ class _ViewerState extends State<Viewer> {
     } else {
       keyIdNext = (nextKeyId);
       print(
-          "Next Key ID was NOT null; setting to stored key ID value of ${keyIdNext}");
+          "Next Key ID was NOT null; setting to stored key ID value of $keyIdNext");
     }
 
     if (prefs.getInt('prev') == null) {
@@ -132,7 +132,7 @@ class _ViewerState extends State<Viewer> {
     } else {
       keyIdPrev = prefs.getInt('prev')!;
       print(
-          "key ID for previous was NOT null, loaded from settings to: ${keyIdPrev}");
+          "key ID for previous was NOT null, loaded from settings to: $keyIdPrev");
     }
 
     if (prefs.getBool('showBottomProgressIndicator') != null) {
@@ -191,7 +191,7 @@ class _ViewerState extends State<Viewer> {
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     String timestr = "";
     if (duration.inHours > 0) {
-      timestr = twoDigits(duration.inHours) + ":";
+      timestr = "${twoDigits(duration.inHours)}:";
     }
     timestr += "$twoDigitMinutes:$twoDigitSeconds";
     if (duration.inHours > 24) {
@@ -202,13 +202,13 @@ class _ViewerState extends State<Viewer> {
 
   @override
   Widget build(BuildContext context) {
-    if (song != null && songPath != null) {
+    if (song != null) {
       Widget pageIndicator = Container();
       //print("Page indicator: Pages: ${pages}; current page: ${currentPage}");
       if (showBottomProgressIndicator && pages != null && pages! > 1) {
         pageIndicator = LinearProgressIndicator(
             value: ((currentPage + 1) / pages!),
-            color: Color.fromRGBO(80, 155, 180, 1));
+            color: const Color.fromRGBO(80, 155, 180, 1));
       }
 
       Widget durationDisplay = Container();
@@ -239,19 +239,19 @@ class _ViewerState extends State<Viewer> {
                   print(
                       "Key is pressed! Character: ${event.character}; logical key: ${event.logicalKey.keyId}");
                   print(
-                      "Comparing to next key ID: ${keyIdNext} and previous: ${keyIdPrev}");
+                      "Comparing to next key ID: $keyIdNext and previous: $keyIdPrev");
                   //print("Key ID: ${event.logicalKey.keyId}");
                   if (event.logicalKey == LogicalKeyboardKey(keyIdNext)) {
                     print("Going to the next page...");
 
                     _pageController.nextPage(
-                        duration: Duration(milliseconds: 150),
+                        duration: const Duration(milliseconds: 150),
                         curve: Curves.easeIn);
                   } else if (event.logicalKey ==
                       LogicalKeyboardKey(keyIdPrev)) {
                     print("Going to the previous page...");
                     _pageController.previousPage(
-                        duration: Duration(milliseconds: 150),
+                        duration: const Duration(milliseconds: 150),
                         curve: Curves.easeOut);
                   }
                 }
@@ -270,7 +270,7 @@ class _ViewerState extends State<Viewer> {
                   appBar: _showAppBar
                       ? AppBar(
                           title: Text(song!.display_name),
-                          leading: BackButton(),
+                          leading: const BackButton(),
                           actions: <Widget>[
                             IconButton(
                               icon: const Icon(Icons.edit_note),
@@ -339,8 +339,8 @@ class _ViewerState extends State<Viewer> {
                                 );
                               },
                               itemCount: song!.pages,
-                              loadingBuilder: (context, progress) => Center(
-                                child: Container(
+                              loadingBuilder: (context, progress) => const Center(
+                                child: SizedBox(
                                   width: 20.0,
                                   height: 20.0,
                                   child: CircularProgressIndicator(value: null),
@@ -359,11 +359,11 @@ class _ViewerState extends State<Viewer> {
                             pageIndicator
                           ]),
                           Positioned.fill(
+                              bottom: 10,
+                              right: 10,
                               child: Align(
                                   alignment: Alignment.bottomRight,
-                                  child: durationDisplay),
-                              bottom: 10,
-                              right: 10)
+                                  child: durationDisplay))
                         ],
                       )
                       /*PdfView(
@@ -385,7 +385,7 @@ class _ViewerState extends State<Viewer> {
 
                       ))));
     } else {
-      return Text("Loading...");
+      return const Text("Loading...");
     }
 
     /*

@@ -6,7 +6,7 @@ class SettingsFootpedalConfigRow extends StatefulWidget {
   final String storageKey;
   final String label;
 
-  const SettingsFootpedalConfigRow({Key? key, required this.label, required this.storageKey}) : super(key: key);
+  const SettingsFootpedalConfigRow({super.key, required this.label, required this.storageKey});
 
 
 
@@ -64,7 +64,7 @@ print("Getting key settings..");
     Widget? lastSelector;
 
       lastSelector = ElevatedButton(
-        child: Text("Choose"),
+        child: const Text("Choose"),
         onPressed: () {
           isListeningForKeypress = true;
 
@@ -74,7 +74,7 @@ print("Getting key settings..");
               title: const Text('AlertDialog Title'),
               content: KeyboardListener(focusNode: FocusNode(),
               autofocus: true,
-              child: Text("Press key"),
+              child: const Text("Press key"),
               onKeyEvent: (event) {
                 if (isListeningForKeypress && event.logicalKey.keyId > 0) {
                   isListeningForKeypress = false;

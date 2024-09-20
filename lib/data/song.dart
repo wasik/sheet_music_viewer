@@ -47,7 +47,7 @@ class Song {
   }
 
   Map<String, Object?> toMap() {
-    final map = Map<String, dynamic>();
+    final map = <String, dynamic>{};
     map['id'] = id;
     map['filename'] = filename;
     map['display_name'] = display_name;
@@ -67,7 +67,7 @@ class Song {
          extension: res["extension"],
          pages: res["pages"]
      );
-     print("This song: ${thisSong}");
+     print("This song: $thisSong");
      return thisSong;
    }
 }

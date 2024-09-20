@@ -7,7 +7,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DbManager {
-  static final _dbName = "sheet_music_viewer.db";
+  static const _dbName = "sheet_music_viewer.db";
 
   // Use this class as a singleton
   DbManager._privateConstructor();
@@ -21,7 +21,7 @@ class DbManager {
     where: "id=?",
     whereArgs: [id]);
 
-    print("Query result: ${queryResult}");
+    print("Query result: $queryResult");
 
     if (queryResult.isEmpty) {
       print("Query result is empty");
@@ -46,7 +46,7 @@ class DbManager {
     for (int setid in selectedSetIds.keys) {
       await db.rawInsert('insert into setsongs (set_id, song_id) values(?, ?)',
           [setid, songId]);
-    };
+    }
 
   }
 
@@ -86,10 +86,10 @@ class DbManager {
     Map selIds = {};
     final list = await db.rawQuery('select * from setsongs where set_id=?', [setId]);
     //print("Queried list of set songs... ${list}");
-    list.forEach((dbitem) {
+    for (var dbitem in list) {
       //print("Setting song ID of ${dbitem['song_id']} to true...");
       selIds[dbitem['song_id']] = true;
-    });
+    }
     return selIds;
   }
 
@@ -98,10 +98,10 @@ class DbManager {
     Map selIds = {};
     final list = await db.rawQuery('select * from setsongs where song_id=?', [songId]);
     //print("Queried list of set songs... ${list}");
-    list.forEach((dbitem) {
+    for (var dbitem in list) {
       //print("Setting song ID of ${dbitem['song_id']} to true...");
       selIds[dbitem['set_id']] = true;
-    });
+    }
     return selIds;
   }
 
@@ -109,7 +109,7 @@ class DbManager {
     Database db = await instance.database;
 
     List<Map<String, dynamic>> list;
-print("Called db.getSongsForSet where setId=${setId}");
+print("Called db.getSongsForSet where setId=$setId");
     if (setId == null) {
       list = await db.rawQuery('select * from songs order by songs.display_name');
     } else {
@@ -132,7 +132,7 @@ print("Called db.getSongsForSet where setId=${setId}");
   Future<int> addSongFromFile(String path, int pages) async {
 
     Database database = await instance.database;
-    print("In DbManager; going to add song with path: ${path}");
+    print("In DbManager; going to add song with path: $path");
     /*return database.insert(
       'songs',
       tvSeries.toDbMap(),
@@ -140,34 +140,34 @@ print("Called db.getSongsForSet where setId=${setId}");
     );
      */
 
-    String display_name = basenameWithoutExtension(path);
+    String displayName = basenameWithoutExtension(path);
 
     return database.rawInsert('''
     insert into songs (filename, display_name, is_single_file, extension, pages) 
     values(?, ?, ?, ?, ?);
-    ''', [basename(path), display_name, 1, extension(path), pages]);
+    ''', [basename(path), displayName, 1, extension(path), pages]);
   }
 
   Future<void> removeSongFromSet(int songId, int setId) async {
     Database database = await instance.database;
-    print("Going to remove song ${songId} from set ID ${setId}");
+    print("Going to remove song $songId from set ID $setId");
     await database.rawDelete('delete from setsongs where set_id=? and song_id=?', [setId, songId]);
     print("Done removing song.");
   }
 
   Future<void> deleteSong(int songId) async {
     Database database = await instance.database;
-    print("Going to remove song ${songId} from database");
+    print("Going to remove song $songId from database");
     await database.rawDelete('delete from setsongs where song_id=?', [songId]);
     await database.rawDelete('delete from songs where id=?', [songId]);
   }
 
   Future<void> deleteSet(int setId) async {
     Database database = await instance.database;
-    print("Going to delete set ID ${setId}");
+    print("Going to delete set ID $setId");
     await database.rawDelete('delete from setsongs where set_id=?', [setId]);
     await database.rawDelete('delete from sets where id=?', [setId]);
-    print("Done deleting set ID ${setId}");
+    print("Done deleting set ID $setId");
   }
 
   Future<int> saveSet(int? setId, List<int> selectedSongIds, String setName) async {
@@ -200,8 +200,8 @@ print("Called db.getSongsForSet where setId=${setId}");
     String filename = basename(path);
     Database database = await instance.database;
 
-    int? num_files = Sqflite.firstIntValue(await database.rawQuery('SELECT COUNT(*) FROM songs where filename=?', [filename]));
-    if (num_files == null || num_files == 0) {
+    int? numFiles = Sqflite.firstIntValue(await database.rawQuery('SELECT COUNT(*) FROM songs where filename=?', [filename]));
+    if (numFiles == null || numFiles == 0) {
       return false;
     }
     return true;
@@ -214,13 +214,13 @@ print("Called db.getSongsForSet where setId=${setId}");
   Future <Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _dbName);
-    print("Going to load database from path: ${path}");
+    print("Going to load database from path: $path");
 
     return await openDatabase(
       path,
       version: migrations.length,
       onCreate: (db, version) async {
-        print("Creating new database... ${db}");
+        print("Creating new database... $db");
         _runMigrations(db, 0, version);
 
         print("Database tables (hopefully) created...");

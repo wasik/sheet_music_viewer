@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'db_manager.dart';
 import 'data/song.dart';
 import 'data/set.dart';
 import 'ui/music_list_row.dart';
-import 'ui/viewer.dart';
 
 class MusicList extends StatefulWidget {
   final int? setId;
   final void Function(int)? changeBottomNavTab;
 
-  const MusicList({Key? key, this.setId, this.changeBottomNavTab})
-      : super(key: key);
+  const MusicList({super.key, this.setId, this.changeBottomNavTab});
 
   @override
   _MusicListState createState() => _MusicListState();
@@ -21,7 +18,7 @@ class MusicList extends StatefulWidget {
 class _MusicListState extends State<MusicList> {
   var db = DbManager.instance;
   List<Song> songs = List.empty();
-  Set? currentset = null;
+  Set? currentset;
 
   @override
   void initState() {
@@ -34,9 +31,9 @@ class _MusicListState extends State<MusicList> {
     print("Going to rebuild song list for set ID ${widget.setId ?? "None"}!");
 
     if (widget.setId != null) {
-      db.getSet(widget.setId!).then((retrieved_set) {
+      db.getSet(widget.setId!).then((retrievedSet) {
         setState(() {
-          currentset = retrieved_set;
+          currentset = retrievedSet;
         });
       });
     }
@@ -44,7 +41,7 @@ class _MusicListState extends State<MusicList> {
     db.getSongsForSet(widget.setId).then((songlist) {
       //print("Data returned; going to call setState...");
       setState(() {
-        print("Retrieved songs! Song list: ${songlist}");
+        print("Retrieved songs! Song list: $songlist");
         songs = songlist;
       });
     });
@@ -100,7 +97,7 @@ class _MusicListState extends State<MusicList> {
     return Column(children: [
       AppBar(
         title: currentset == null
-            ? Text("All Sheets")
+            ? const Text("All Sheets")
             : Text("Sheets in ${currentset!.name}"),
       ),
       Expanded(

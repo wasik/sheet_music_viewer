@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 class PageImageEditor extends StatefulWidget {
   final File image;
 
-  const PageImageEditor({Key? key, required this.image}) : super(key: key);
+  const PageImageEditor({super.key, required this.image});
 
   @override
   State<PageImageEditor> createState() => _PageImageEditorState();
@@ -15,10 +15,13 @@ class PageImageEditor extends StatefulWidget {
 
 class _PageImageEditorState extends State<PageImageEditor> {
   final _key = GlobalKey<ScaffoldState>();
-  final _imageKey = GlobalKey<ImagePainterState>();
+  //final _imageKey = GlobalKey<ImagePainterState>();
+  final imagePainterController = ImagePainterController(strokeWidth: 2, color: Colors.blue, mode: PaintMode.freeStyle);
+
 
   void saveImage() async {
-    final image = await _imageKey.currentState!.exportImage();
+    //final image = await _imageKey.currentState!.exportImage();
+    final image = await imagePainterController.exportImage();
     final directory = (await getApplicationDocumentsDirectory()).path;
     await Directory('$directory/sample').create(recursive: true);
     final imgFile = widget.image;
@@ -32,8 +35,8 @@ class _PageImageEditorState extends State<PageImageEditor> {
     return Scaffold(
         key: _key,
         appBar: AppBar(
-          title: Text("Annotate Page"),
-          leading: BackButton(),
+          title: const Text("Annotate Page"),
+          leading: const BackButton(),
           actions: <Widget>[
             /*IconButton(
                 icon: const Icon(Icons.cancel),
@@ -47,12 +50,7 @@ class _PageImageEditorState extends State<PageImageEditor> {
             )
           ],
         ),
-        body: ImagePainter.file(widget.image,
-            key: _imageKey,
-            scalable: true,
-            initialStrokeWidth: 2.0,
-            initialColor: Colors.blue,
-            brushIcon: null,
-            initialPaintMode: PaintMode.freeStyle));
+        body: ImagePainter.file(widget.image, controller: imagePainterController)
+    );
   }
 }

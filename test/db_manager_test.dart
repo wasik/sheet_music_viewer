@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sheet_music_viewer/data/song.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sheet_music_viewer/db_manager.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -14,7 +13,7 @@ Future main() async {
   late int song2;
   late int setId;
 
-  Future _initTestData(DbManager db) async {
+  Future initTestData(DbManager db) async {
     Database d = await db.database;
     await d.rawDelete("delete from songs");
     await d.rawDelete("delete from sets");
@@ -32,7 +31,7 @@ Future main() async {
 
   group('Features of version 2', () {
     setUp(() async {
-      await _initTestData(db);
+      await initTestData(db);
     });
 
     test('keeps the original order of songs in sets', () async {

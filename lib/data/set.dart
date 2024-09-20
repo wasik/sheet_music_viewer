@@ -1,6 +1,3 @@
-import '../db_manager.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 class Set {
   int id;
@@ -20,7 +17,7 @@ class Set {
   }
 
   Map<String, Object?> toMap() {
-    final map = Map<String, dynamic>();
+    final map = <String, dynamic>{};
     map['id'] = id;
     map['name'] = name;
     return map;
@@ -45,7 +42,7 @@ class Set {
     if (res.containsKey("numSongs")) {
       thisSet.numSongs = res["numSongs"];
     }
-    print("This set: ${thisSet}");
+    print("This set: $thisSet");
     return thisSet;
   }
 

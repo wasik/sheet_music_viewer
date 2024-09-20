@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../data/song.dart';
 
 import 'package:sheet_music_viewer/db_manager.dart';
@@ -10,7 +9,7 @@ class SetEditor extends StatefulWidget {
   final Set? set;
   final VoidCallback onSetChanged;
 
-  const SetEditor({Key? key, required this.set, required this.onSetChanged}) : super(key: key);
+  const SetEditor({super.key, required this.set, required this.onSetChanged});
 
   @override
   _SetEditorState createState() => _SetEditorState();
@@ -24,7 +23,7 @@ class _SetEditorState extends State<SetEditor> {
   var db = DbManager.instance;
   List<Song> songs = List.empty();
 
-  TextEditingController _changeSetNameController = TextEditingController();
+  final TextEditingController _changeSetNameController = TextEditingController();
 
   Map checkedIds = {};
 
@@ -44,7 +43,7 @@ class _SetEditorState extends State<SetEditor> {
     db.getSongsForSet(null).then((songlist) {
       print("Data returned; going to call setState...");
       setState(() {
-        print("Retrieved songs! Song list: ${songlist}");
+        print("Retrieved songs! Song list: $songlist");
         songs = songlist;
       });
     });
@@ -52,10 +51,10 @@ class _SetEditorState extends State<SetEditor> {
 
   Future<void> saveSet(String newName) async {
     var db = DbManager.instance;
-    print("Going to save a set with the name ${newName} and checked IDs: ${checkedIds}");
+    print("Going to save a set with the name $newName and checked IDs: $checkedIds");
 
     await db.saveSet(
-        widget.set == null ? null : widget.set!.id,
+        widget.set?.id,
         checkedIds.keys.map((k) => k as int).toList(),
       newName
     );
@@ -72,7 +71,7 @@ class _SetEditorState extends State<SetEditor> {
 
     Widget songSelector;
     if (songs.isEmpty) {
-      songSelector = Text("(No songs found; import songs on the Settings tab)");
+      songSelector = const Text("(No songs found; import songs on the Settings tab)");
     } else {
       songSelector = ConstrainedBox(
         constraints: BoxConstraints(
@@ -103,7 +102,7 @@ class _SetEditorState extends State<SetEditor> {
     return AlertDialog(
       title: Text(dialogTitle),
       content: SingleChildScrollView(
-        child: Container(
+        child: SizedBox(
           width: double.maxFinite,
           child: Form(
             key: _formKey,
@@ -114,7 +113,7 @@ class _SetEditorState extends State<SetEditor> {
                 autofocus: false,
                 maxLines: 1,
                 controller: _changeSetNameController,
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
                 validator:(value) {
                   if (value == null || value.isEmpty) {
                     return 'Set Name is required';
@@ -124,13 +123,13 @@ class _SetEditorState extends State<SetEditor> {
                   }
                   return null;
                 },
-                decoration: new InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   labelText: "Set Name",
                 ),
               ),
-              SizedBox(height:40),
-              Align(alignment: Alignment.centerLeft,
+              const SizedBox(height:40),
+              const Align(alignment: Alignment.centerLeft,
                   child: Text("Songs", style: TextStyle(fontSize:20, fontWeight: FontWeight.w400),)
               ),
 
@@ -143,7 +142,7 @@ class _SetEditorState extends State<SetEditor> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
           onPressed: () {
             setState(() {
               Navigator.pop(context);
@@ -151,7 +150,7 @@ class _SetEditorState extends State<SetEditor> {
           },
         ),
         ElevatedButton(
-          child: Text('Save'),
+          child: const Text('Save'),
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               saveSet(_changeSetNameController.text);

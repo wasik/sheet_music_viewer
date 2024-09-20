@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'set_list.dart';
-import 'set_list.dart';
 
 class SetListNavigator extends StatefulWidget {
-  const SetListNavigator({Key? key}) : super(key: key);
+  const SetListNavigator({super.key});
 
   @override
   SetListNavigatorState createState() => SetListNavigatorState();
@@ -33,7 +32,7 @@ class SetListNavigatorState extends State<SetListNavigator> {
         return MaterialPageRoute(
             settings: settings,
             builder: (BuildContext context) {
-              print("Building the SetListNavigator; settings = ${settings}");
+              print("Building the SetListNavigator; settings = $settings");
               switch (settings.name) {
                 case '/':
                   return SetList(key: _setListState);

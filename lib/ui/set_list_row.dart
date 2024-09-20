@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../data/set.dart';
-import 'viewer.dart';
 import '../db_manager.dart';
 import '../music_list.dart';
 import 'set_editor.dart';
@@ -10,7 +9,7 @@ class SetListRow extends StatefulWidget {
   final Set initialSet;
   final VoidCallback onSetUpdated;
 
-  const SetListRow({Key? key, required this.initialSet, required this.onSetUpdated}) : super(key: key);
+  const SetListRow({super.key, required this.initialSet, required this.onSetUpdated});
 
   @override
   _SetListRowState createState() => _SetListRowState();
@@ -42,7 +41,7 @@ class _SetListRowState extends State<SetListRow> {
             //subtitle: Text(song.filename.toString()),
             subtitle: Text("${set.numSongs} song${set.numSongs == 1 ? "" : "s"}"),
             trailing: PopupMenuButton(
-              child: Icon(Icons.more_vert),
+              child: const Icon(Icons.more_vert),
               onSelected: (value) {
                 if (value == "edit") {
                   SetEditor se = SetEditor(set: set, onSetChanged: () {
@@ -61,12 +60,12 @@ class _SetListRowState extends State<SetListRow> {
               },
               itemBuilder: (context) => [
                 const PopupMenuItem(
-                  child: Text("Choose Songs"),
                   value: "edit",
+                  child: Text("Choose Songs"),
                 ),
                 const PopupMenuItem(
-                  child: Text("Delete Set"),
                   value: "delete",
+                  child: Text("Delete Set"),
                 ),
               ],
             ),

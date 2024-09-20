@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'set_editor.dart';
 import '../data/set.dart';
 import '../ui/set_list_row.dart';
@@ -7,7 +6,7 @@ import '../ui/set_list_row.dart';
 import '../db_manager.dart';
 
 class SetList extends StatefulWidget {
-  const SetList({Key? key}) : super(key: key);
+  const SetList({super.key});
 
   @override
   SetListState createState() => SetListState();
@@ -42,7 +41,7 @@ class SetListState extends State<SetList> {
   Widget build(BuildContext context) {
     Widget bodyWidget;
     if (sets.isEmpty) {
-      bodyWidget = Center(
+      bodyWidget = const Center(
         child: Text(
           'No sets found. Create one by clicking the + icon below',
           style: TextStyle(fontSize: 18),
@@ -65,7 +64,7 @@ class SetListState extends State<SetList> {
     return Stack(children: [
       Column(
         children: [AppBar(
-          title: Text("Sets"),
+          title: const Text("Sets"),
         ),
           Expanded(child: bodyWidget)
         ]

@@ -2,16 +2,13 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:sheet_music_viewer/ui/set_list_navigator.dart';
-import 'placeholder_widget.dart';
 import 'music_list.dart';
-import 'ui/set_list.dart';
-import 'ui/set_editor.dart';
 
 import 'settings_widget.dart';
-import 'importer_widget.dart';
-import 'dart:developer';
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
   State createState() {
     return _HomeState();
@@ -32,7 +29,7 @@ class _HomeState extends State {
     _children = [
       MusicList(changeBottomNavTab: onTabTapped,),
       SetListNavigator(key: _setListNavigator),
-      SettingsWidget(),
+      const SettingsWidget(),
     ];
   }
 
@@ -76,7 +73,7 @@ class _HomeState extends State {
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped, // new
         currentIndex: _currentIndex, // new
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.music_note),
             label: 'All Sheets',
