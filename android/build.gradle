@@ -8,8 +8,13 @@ allprojects {
 def newBuildDir = rootProject.layout.buildDirectory.dir("../../build").get()
 rootProject.layout.buildDirectory.value(newBuildDir)
 
+// Keep these as two separate blocks: every project's build directory must be
+// moved before evaluationDependsOn forces :app to be evaluated, or :app
+// records paths (e.g. R8's default ProGuard files) under the old location.
 subprojects {
     project.layout.buildDirectory.value(newBuildDir.dir(project.name))
+}
+subprojects {
     project.evaluationDependsOn(':app')
 }
 
