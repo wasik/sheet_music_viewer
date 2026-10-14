@@ -38,15 +38,9 @@ class _SettingsFootpedalConfigRowState extends State<SettingsFootpedalConfigRow>
     SharedPreferences prefs = await SharedPreferences.getInstance();
 print("Getting key settings..");
     int? retrievedKeyId = prefs.getInt(widget.storageKey);
-    if (retrievedKeyId == null) {
-      setState(() {
-        keyId = 0;
-      });
-    } else {
-      setState(() {
-        keyId = retrievedKeyId;
-      });
-    }
+    setState(() {
+      keyId = retrievedKeyId ?? 0;
+    });
   }
 
 
@@ -71,10 +65,10 @@ print("Getting key settings..");
           showDialog<String>(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-              title: const Text('AlertDialog Title'),
+              title: Text('Set "${widget.label}" key'),
               content: KeyboardListener(focusNode: FocusNode(),
               autofocus: true,
-              child: const Text("Press key"),
+              child: const Text("Press the foot pedal (or keyboard key) to use."),
               onKeyEvent: (event) {
                 if (isListeningForKeypress && event.logicalKey.keyId > 0) {
                   isListeningForKeypress = false;

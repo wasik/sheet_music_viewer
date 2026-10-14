@@ -8,9 +8,11 @@ import '../db_manager.dart';
 class MusicListRow extends StatefulWidget {
   final Song initialSong;
   final int? isPartOfListId;
+  /// Song IDs of the containing set, in order, so the viewer can continue to the next song.
+  final List<int>? setSongIds;
   final VoidCallback onSongNameUpdated;
 
-  const MusicListRow({super.key, required this.initialSong, required this.isPartOfListId, required this.onSongNameUpdated});
+  const MusicListRow({super.key, required this.initialSong, required this.isPartOfListId, this.setSongIds, required this.onSongNameUpdated});
 
   @override
   _MusicListRowState createState() => _MusicListRowState();
@@ -249,7 +251,7 @@ class _MusicListRowState extends State<MusicListRow> {
     return Card(
         child: ListTile(
             //color: Colors.amber[colorCodes[index]],
-            title: Text(song.toString(), style: TextStyle(
+            title: Text(song.toString(), style: const TextStyle(
               fontSize: 18,
             )
             ),
@@ -277,7 +279,7 @@ class _MusicListRowState extends State<MusicListRow> {
             ),
             onTap: () {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                  builder: (context) => Viewer(song.id)));
+                  builder: (context) => Viewer(song.id, setSongIds: widget.setSongIds)));
               /*
                         final snackBar = SnackBar(content: Text('Clicked on index $index that has ID ${songdata[index].id}'));
                             ScaffoldMessenger.of(context).showSnackBar(snackBar);

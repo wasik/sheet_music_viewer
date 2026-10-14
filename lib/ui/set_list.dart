@@ -4,6 +4,7 @@ import '../data/set.dart';
 import '../ui/set_list_row.dart';
 
 import '../db_manager.dart';
+import '../library_events.dart';
 
 class SetList extends StatefulWidget {
   const SetList({super.key});
@@ -26,11 +27,19 @@ class SetListState extends State<SetList> {
     super.initState();
     print("Going to call db.get songs for set...");
     rebuildSetlist();
+    libraryChanged.addListener(rebuildSetlist);
+  }
+
+  @override
+  void dispose() {
+    libraryChanged.removeListener(rebuildSetlist);
+    super.dispose();
   }
 
   void rebuildSetlist() {
     print("Going to rebuild song list!");
     db.getSets().then((setlist) {
+      if (!mounted) return;
       setState(() {
         sets = setlist;
       });

@@ -196,12 +196,39 @@ print("Called db.getSongsForSet where setId=$setId");
     return updatedId;
   }
 
+  /// The page the song was last viewed at (0-based).
+  Future<int> getLastPage(int songId) async {
+    Database database = await instance.database;
+    return Sqflite.firstIntValue(await database.rawQuery(
+            'select last_page from songs where id=?', [songId])) ??
+        0;
+  }
+
+  Future<void> setLastPage(int songId, int page) async {
+    Database database = await instance.database;
+    await database.rawUpdate(
+        'update songs set last_page=? where id=?', [page, songId]);
+  }
+
+  Future<String> get databasePath async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    return join(documentsDirectory.path, _dbName);
+  }
+
+  /// Closes the database; it is reopened on next use. Needed before the
+  /// database file is copied or replaced (backup / restore).
+  Future<void> close() async {
+    final db = _database;
+    _database = null;
+    await db?.close();
+  }
+
   Future<bool> doesSongExist(String path) async {
     String filename = basename(path);
     Database database = await instance.database;
 
     int? numFiles = Sqflite.firstIntValue(await database.rawQuery('SELECT COUNT(*) FROM songs where filename=?', [filename]));
-    if (numFiles == null || numFiles == 0) {
+    if (numFiles == 0) {
       return false;
     }
     return true;
@@ -212,8 +239,7 @@ print("Called db.getSongsForSet where setId=$setId");
 
   // Creates and opens the database.
   Future <Database> _initDatabase() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, _dbName);
+    String path = await databasePath;
     print("Going to load database from path: $path");
 
     return await openDatabase(
@@ -221,7 +247,7 @@ print("Called db.getSongsForSet where setId=$setId");
       version: migrations.length,
       onCreate: (db, version) async {
         print("Creating new database... $db");
-        _runMigrations(db, 0, version);
+        await _runMigrations(db, 0, version);
 
         print("Database tables (hopefully) created...");
       },
@@ -242,6 +268,7 @@ print("Called db.getSongsForSet where setId=$setId");
   var migrations = [
     _initialize1,
     _upgrade2,
+    _upgrade3,
   ];
 
   static void _initialize1(Batch batch) {
@@ -264,5 +291,10 @@ print("Called db.getSongsForSet where setId=$setId");
   static void _upgrade2(Batch batch) {
     print("Migration 2");
     batch.execute("alter table setsongs add column ordering;");
+  }
+
+  static void _upgrade3(Batch batch) {
+    print("Migration 3");
+    batch.execute("alter table songs add column last_page integer default 0;");
   }
 }

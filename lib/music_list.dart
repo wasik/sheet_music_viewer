@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'db_manager.dart';
+import 'library_events.dart';
 import 'data/song.dart';
 import 'data/set.dart';
 import 'ui/music_list_row.dart';
@@ -25,6 +26,13 @@ class _MusicListState extends State<MusicList> {
     super.initState();
     print("Going to call db.get songs for set with setID ${widget.setId ?? "N/A"}...");
     rebuildSonglist();
+    libraryChanged.addListener(rebuildSonglist);
+  }
+
+  @override
+  void dispose() {
+    libraryChanged.removeListener(rebuildSonglist);
+    super.dispose();
   }
 
   void rebuildSonglist() {
@@ -32,6 +40,7 @@ class _MusicListState extends State<MusicList> {
 
     if (widget.setId != null) {
       db.getSet(widget.setId!).then((retrievedSet) {
+        if (!mounted) return;
         setState(() {
           currentset = retrievedSet;
         });
@@ -40,6 +49,7 @@ class _MusicListState extends State<MusicList> {
 
     db.getSongsForSet(widget.setId).then((songlist) {
       //print("Data returned; going to call setState...");
+      if (!mounted) return;
       setState(() {
         print("Retrieved songs! Song list: $songlist");
         songs = songlist;
@@ -66,6 +76,9 @@ class _MusicListState extends State<MusicList> {
               key: ObjectKey(songs[index]),
               initialSong: songs[index],
               isPartOfListId: widget.setId,
+              setSongIds: widget.setId == null
+                  ? null
+                  : songs.map((s) => s.id).toList(),
               onSongNameUpdated: rebuildSonglist);
         },
         onReorder: (int oldIndex, int newIndex) {

@@ -2,7 +2,11 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:sheet_music_viewer/ui/set_list_navigator.dart';
+import 'dart:io';
+
+import 'importer.dart';
 import 'music_list.dart';
+import 'native_bridge.dart';
 
 import 'settings_widget.dart';
 
@@ -31,6 +35,25 @@ class _HomeState extends State {
       SetListNavigator(key: _setListNavigator),
       const SettingsWidget(),
     ];
+
+    // PDFs opened with / shared to the app, at launch or while it's running.
+    NativeBridge.setOnFilesShared(_importSharedFiles);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final shared = await NativeBridge.getInitialSharedFiles();
+      if (!shared.isEmpty) _importSharedFiles(shared);
+    });
+  }
+
+  Future<void> _importSharedFiles(SharedFiles shared) async {
+    if (!mounted) return;
+    onTabTapped(0);
+    await importPdfFilesWithProgress(context, shared.paths, unreadable: shared.failed);
+    // These were temporary copies made by MainActivity.
+    for (final path in shared.paths) {
+      try {
+        File(path).parent.deleteSync(recursive: true);
+      } catch (_) {}
+    }
   }
 
   void setupDefaultPreferences() async {
